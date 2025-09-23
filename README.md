@@ -71,17 +71,6 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Docker Installation (Recommended)
-
-```bash
-# Build the Docker image
-docker build -t multi-rag-chatbot .
-
-# Run the container
-docker run -p 8501:8501 multi-rag-chatbot
-```
-
----
 
 ## 🚀 Quick Start
 
@@ -107,16 +96,6 @@ results = chatbot.compare_algorithms(question)
 # View performance metrics
 chatbot.display_metrics()
 ```
-
-### 3. Launch Web Interface
-```bash
-# Start the Streamlit app
-streamlit run app.py
-```
-
-Navigate to `http://localhost:8501` to access the interactive interface.
-
----
 
 ## 💡 Usage Examples
 
@@ -161,15 +140,6 @@ The framework provides comprehensive evaluation metrics:
 - **Resource Usage**: Memory and CPU consumption
 - **Coherence Score**: Semantic consistency of responses
 
-### Sample Results
-```
-Algorithm         | Accuracy | Latency | Memory Usage
-------------------|----------|---------|-------------
-Probabilistic RAG | 87.3%    | 1.2s    | 245MB
-Graph RAG         | 91.7%    | 2.1s    | 312MB
-BM25             | 78.9%    | 0.8s    | 123MB
-```
-
 ---
 
 ## 📁 Project Structure
@@ -195,7 +165,6 @@ multi-rag-chatbot/
 │   └── tutorials/
 ├── 🧪 tests/
 ├── 📊 examples/
-├── 🐳 Dockerfile
 ├── 📋 requirements.txt
 └── 📖 README.md
 ```
@@ -234,28 +203,11 @@ retrieval:
   chunk_size: 1000
   chunk_overlap: 200
   top_k: 5
-  
-evaluation:
-  metrics: ["accuracy", "latency", "coherence"]
-  benchmark_dataset: "./data/qa_benchmark.json"
+  algorithms:
+    - probabilistic
+    - graph
+    - bm25
 ```
-
----
-
-## 📈 Benchmarks & Results
-
-### Performance on Standard Datasets
-
-| Dataset | Probabilistic RAG | Graph RAG | BM25 | Best Algorithm |
-|---------|------------------|-----------|------|----------------|
-| SQuAD 2.0 | 84.2% | **88.7%** | 79.1% | Graph RAG |
-| MS MARCO | **89.4%** | 87.3% | 82.6% | Probabilistic RAG |
-| Natural Questions | 86.1% | **90.2%** | 78.9% | Graph RAG |
-
-### Resource Requirements
-- **Minimum**: 8GB RAM, 2 CPU cores
-- **Recommended**: 16GB RAM, 4+ CPU cores, GPU (optional)
-- **Storage**: 2GB + document storage
 
 ---
 
@@ -324,7 +276,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [LangChain](https://langchain.com/) for RAG framework inspiration
 - [Hugging Face](https://huggingface.co/) for transformer models
-- [Streamlit](https://streamlit.io/) for the web interface
 - The open-source community for various libraries and tools
 
 ---
