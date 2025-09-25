@@ -49,7 +49,7 @@ except Exception as e:
     sys.exit(1)
 
 def groq_call(prompt: str) -> str:
-    """Make API call to Groq"""
+    """This is to make apt call for opersource LLMs hosted on Groq platform"""
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
     payload = {
@@ -68,7 +68,7 @@ def groq_call(prompt: str) -> str:
 
 @lru_cache(maxsize=128)
 def reformulate_query(original_query):
-    """Reformulate user query for better retrieval"""
+    """ User query for better retrieval"""
     prompt = f"""
     You are an AI assistant tasked with reformulating user queries to improve retrieval in a RAG system. 
     Given the original query, rewrite it to be more specific, detailed, and likely to retrieve relevant information.

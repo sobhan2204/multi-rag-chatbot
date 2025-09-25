@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Aug  7 19:20:15 2025
-
-@author: advit
-"""
-
 from preprocessing import read_pdf, chunk_text, read_email,read_docx, build_faiss_index
 import pickle
 import faiss
