@@ -1,3 +1,6 @@
+
+## CAN USE  rerankers or with neural models.
+
 import os
 import requests
 from functools import lru_cache
@@ -222,29 +225,42 @@ ANSWER:"""
         
         return raw_data
     
-    def _chunk_text(self, text: str, filename: str) -> list:
-        """Split text into overlapping chunks"""
-        chunks = []
-        start = 0
-        text = text.strip()
-        while start < len(text):
-            end = min(start + self.chunk_size, len(text))
-            # Extend to end of sentence for better coherence
-            if end < len(text):
-                end = text.rfind('.', start, end) + 1 or end
-            chunk = f"File: {filename} (chunk starting at char {start})\n{text[start:end]}"
-            chunks.append(chunk)
-            start = end - self.chunk_overlap  # Overlap for context continuity
-        return chunks
+def _chunk_text(self, text: str, filename: str) -> list:
+    """Split text into overlapping chunks safely."""
+    chunks = []
+    start = 0
+    text = text.strip()
+    n = len(text)
+
+    while start < n:
+        end = min(start + self.chunk_size, n)
+
+        # Try to break at sentence boundary if possible
+        if end < n:
+            r = text.rfind('.', start, end)
+            if r != -1 and r > start:
+                end = r + 1
+
+        chunk = f"File: {filename}\n{text[start:end].strip()}"
+        chunks.append(chunk)
+
+        # Move forward safely
+        start = end - self.chunk_overlap
+        if start < 0:  
+            start = 0
+        if start >= n:  
+            break
+
+    return chunks
     
-    def _tokenize(self, text: str) -> list:
+def _tokenize(self, text: str) -> list:
         """Enhanced tokenization for better BM25 performance"""
         # Convert to lowercase, handle newlines, and split on whitespace
         tokens = text.lower().replace('\n', ' ').split()
         # Remove very short tokens (< 2 chars) for better relevance
         return [token for token in tokens if len(token) > 1]
     
-    def _build_index(self) -> None:
+def _build_index(self) -> None:
         """Build BM25 index with optimized parameters"""
         if not self.documents:
             print("No documents to index!")
@@ -257,7 +273,7 @@ ANSWER:"""
         self.bm25 = BM25Okapi(self.tokenized_docs, k1=1, b=0.75)
         print(f" BM25 index built for {len(self.documents)} documents")
     
-    def _search_documents(self, query: str, top_k: int = 5) -> list:
+def _search_documents(self, query: str, top_k: int = 5) -> list:
         """Enhanced document search with scoring and ranking"""
         if not self.bm25:
             return []
@@ -290,8 +306,8 @@ ANSWER:"""
             
         return [doc for doc, score in top_docs]
     
-    @lru_cache(maxsize=128)
-    def _llm_call(self, prompt: str) -> str:
+@lru_cache(maxsize=128)
+def _llm_call(self, prompt: str) -> str:
         """Optimized LLM call with caching"""
         if not GROQ_API_KEY:
             return "Error: GROQ_KEY not found in environment variables"
@@ -328,7 +344,7 @@ ANSWER:"""
         except Exception as e:
             return f"Error: {str(e)}"
     
-    def _generate_answer(self, query: str, context_docs: list) -> str:
+def _generate_answer(self, query: str, context_docs: list) -> str:
         """Generate contextual answer using retrieved documents"""
         if not context_docs:
             return "I couldn't find relevant information in the documents to answer your question."
@@ -352,7 +368,7 @@ ANSWER:"""
         
         return self._llm_call(prompt)
     
-    def query(self, question: str, top_k: int = 3, debug: bool = False) -> str:
+def query(self, question: str, top_k: int = 3, debug: bool = False) -> str:
         """Main query method - the hybrid search interface"""
         if not self.bm25:
             return "System not initialized - no documents loaded."
@@ -369,7 +385,7 @@ ANSWER:"""
         # Generate answer using retrieved context
         return self._generate_answer(question, relevant_docs)
     
-    def interactive_mode(self):
+def interactive_mode(self):
         """Interactive Q&A session"""
         if not self.bm25:
             print("Cannot start - no documents loaded.")
@@ -407,7 +423,7 @@ ANSWER:"""
             except Exception as e:
                 print(f"Error: {e}")
 
-    def test_api_connection() -> bool:
+def test_api_connection() -> bool:
         """Test Groq API connectivity"""
         print(" Testing API connection...")
     

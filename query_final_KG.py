@@ -40,7 +40,7 @@ from enum import Enum
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_KEY")
 
-try:
+try: # sentence transformers import karne me kuch dikkat aa rahi this issiliye try except lagaya hai
     from sentence_transformers import SentenceTransformer, CrossEncoder
 except ImportError as e:
     print(f"Error importing sentence_transformers: {e}")

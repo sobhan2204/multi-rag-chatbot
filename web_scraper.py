@@ -19,9 +19,6 @@ class PDFScraper:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
-        
-        # Create data folder if it doesn't exist
-        os.makedirs(self.data_folder, exist_ok=True)
     
     def get_pdf_links(self, url=None):
         """
@@ -142,17 +139,12 @@ if __name__ == "__main__":
     if not website_url.startswith(('http://', 'https://')):
         website_url = 'https://' + website_url
     
-    # Get custom data folder (optional)
-    data_folder = input("Enter data folder name (press Enter for 'data'): ").strip()
-    if not data_folder:
-        data_folder = 'data'
-    
     print(f"\nTarget URL: {website_url}")
-    print(f"Save location: {data_folder}/")
+    print(f"Save location: data/")
     print("\nStarting scraper...\n")
     
-    # Initialize scraper
-    scraper = PDFScraper(website_url, data_folder=data_folder)
+    # Initialize scraper - always use 'data' folder
+    scraper = PDFScraper(website_url, data_folder='data')
     
     # Scrape all PDFs
     downloaded_files = scraper.scrape_all_pdfs(delay=1)
