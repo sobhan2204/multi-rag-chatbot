@@ -30,3 +30,10 @@ rich
 
 spacy
 exceptions
+
+flask>=2.3.0
+flask-cors>=4.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+rich>=13.0.0
+numpy>=1.24.0

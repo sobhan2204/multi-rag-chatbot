@@ -1,0 +1,19 @@
+2025-11-12 22:53:07,367 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.16.106.106:5000
+2025-11-12 22:53:07,370 [INFO] [33mPress CTRL+C to quit[0m
+2025-11-12 22:53:07,384 [INFO]  * Restarting with stat
+2025-11-12 22:58:57,398 [WARNING]  * Debugger is active!
+2025-11-12 22:58:57,460 [INFO]  * Debugger PIN: 143-262-182
+2025-11-12 22:58:59,290 [INFO] 127.0.0.1 - - [12/Nov/2025 22:58:59] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-11-12 22:59:01,729 [INFO] 127.0.0.1 - - [12/Nov/2025 22:59:01] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-11-12 22:59:01,731 [INFO] 127.0.0.1 - - [12/Nov/2025 22:59:01] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-11-12 22:59:01,912 [INFO] 127.0.0.1 - - [12/Nov/2025 22:59:01] "GET /?__debugger__=yes&cmd=resource&f=console.png&s=V7yyn3pJwnDYmz8DHtib HTTP/1.1" 200 -
+2025-11-12 22:59:03,642 [INFO] 127.0.0.1 - - [12/Nov/2025 22:59:03] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-11-12 23:11:33,130 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.16.106.106:5000
+2025-11-12 23:11:33,132 [INFO] [33mPress CTRL+C to quit[0m
+2025-11-12 23:11:33,134 [INFO]  * Restarting with stat
