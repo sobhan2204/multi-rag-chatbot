@@ -1,0 +1,5 @@
+# IGNORE ALL THESE FILES
+.all-MiniLM-L6-v2
+.env
+.venv
+.faiss_index

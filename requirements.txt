@@ -1,0 +1,33 @@
+requests
+python-dotenv
+rich
+flask
+
+# Only langchain_core.documents.Document and langchain_text_splitters are
+# actually imported (in preprocessing.py) - the full `langchain` and
+# `langchain-community` packages are NOT used and pull in a huge amount of
+# unused integrations (hundreds of MB), so they are intentionally omitted.
+langchain-core==0.1.53
+langchain-text-splitters==0.0.2
+
+# Pinned to versions compatible with the CPU-only torch==2.3.1 build below -
+# unpinned installs resolved to transformers>=2.4, which requires torch>=2.4
+# and silently disables its PyTorch backend against 2.3.1.
+sentence-transformers==3.0.1
+transformers==4.41.2
+faiss-cpu
+pdfplumber
+python-docx
+
+nest_asyncio
+protobuf==3.20.3
+
+rank-bm25
+spacy
+# spacy.cli imports click directly at import time, but modern typer releases
+# no longer pull it in transitively - pin it explicitly so `import spacy`
+# doesn't break on ModuleNotFoundError: No module named 'click'.
+click
+
+beautifulsoup4>=4.12.0
+numpy>=1.24.0

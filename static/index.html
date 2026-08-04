@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Multi-RAG Pipeline</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Unified Multi-RAG Pipeline</h1>
+  <button id="how-it-works-btn" class="ghost-btn">How it works</button>
+</header>
+
+<div class="commands-strip">
+  <span class="commands-label">Commands:</span>
+  <span>Type your query to get an answer</span>
+  <span><code>/ingest</code> - Re-run structure-aware ingestion</span>
+  <span><code>/scrape &lt;URL&gt;</code> - Scrape PDFs from a URL</span>
+  <span><code>/plan &lt;query&gt;</code> - Show query plan before answering</span>
+  <span><code>/compare &lt;query&gt;</code> - Compare Knowledge Graph vs BM25 vs Semantic Search</span>
+  <span><code>q</code>, <code>quit</code>, <code>exit</code> - Exit</span>
+</div>
+
+<main id="chat-feed" class="chat-feed" aria-live="polite"></main>
+
+<footer class="composer">
+  <input id="upload-input" type="file" multiple accept=".pdf,.docx,.eml" hidden>
+  <button id="upload-btn" class="icon-btn" title="Upload document (.pdf, .docx, .eml)">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <input id="query-input" type="text" placeholder="Ask a question, or try /compare, /plan, /ingest, /scrape ..." autocomplete="off">
+  <button id="send-btn" class="primary-btn">Send</button>
+</footer>
+
+<div id="how-it-works-modal" class="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h2 id="modal-title">How it works</h2>
+      <button id="modal-close-btn" class="icon-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <section>
+        <h3>1. Data Ingestion</h3>
+        <ul>
+          <li>Files are read from <code>data/</code>: <code>.pdf</code> via pdfplumber, <code>.docx</code> via python-docx, <code>.eml</code> via Python's <code>email</code> module.</li>
+          <li>Text is split into overlapping chunks (750 characters, 200 overlap) with LangChain's <code>RecursiveCharacterTextSplitter</code>.</li>
+          <li>Each chunk is run through spaCy (<code>en_core_web_sm</code>) named-entity recognition, ignoring low-value types like dates, percentages and cardinal numbers.</li>
+          <li>A regex heuristic ("X is a / are / refers to Y") extracts simple <code>IS_A</code> relationships between capitalized phrases - a lightweight pattern match, not an LLM extractor.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>2. Data Storage</h3>
+        <ul>
+          <li>Entities and relationships live in an in-memory SQLite database, snapshotted to <code>data/corpus_analytics.json</code> so they survive a restart.</li>
+          <li>Chunk embeddings are stored in a FAISS <code>IndexFlatL2</code> index on disk (<code>faiss_index/index.faiss</code>), with the raw chunk text and source filenames pickled alongside (<code>chunks.pkl</code>).</li>
+          <li>BM25's tokenized corpus is kept purely in memory and rebuilt from those same chunks each time the app starts (or after a reindex).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>3. Semantic Search</h3>
+        <ul>
+          <li>The query is embedded with <code>sentence-transformers/all-MiniLM-L6-v2</code> (CPU) and matched against the FAISS index by nearest L2 distance.</li>
+          <li>Candidates from all retrieval sources are then re-ranked together by a shared local cross-encoder for the final ordering.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>4. BM25</h3>
+        <ul>
+          <li>Classic lexical term-frequency scoring (<code>rank_bm25.BM25Okapi</code>) over lowercased, tokenized chunks.</li>
+          <li>Purely keyword-based - it complements semantic search by catching exact-term matches that embeddings can sometimes miss.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>5. Dynamic Knowledge Graph</h3>
+        <ul>
+          <li>Not a separate graph database - it's a thin query layer over the same SQLite <code>relationships</code> table populated during ingestion.</li>
+          <li>Given an entity from the query, it does a 1-hop neighborhood lookup (rows where that entity is the source or target).</li>
+          <li>Powers aggregation-style questions and the "Knowledge Graph" column in <code>/compare</code>.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>6. Agentic Retrieval</h3>
+        <ul>
+          <li>Triggered when the LLM query planner classifies a question as needing multi-hop reasoning.</li>
+          <li>Runs hybrid retrieval in a loop (up to a configured number of steps), accumulating and de-duplicating context.</li>
+          <li>Between steps, an LLM gap-assessment call decides whether the context gathered so far is sufficient or whether a follow-up query is needed.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>7. Validators</h3>
+        <ul>
+          <li><strong>Retrieval Validator</strong> - embedding cosine similarity between the query and each retrieved chunk (semantic relevance, not keyword overlap).</li>
+          <li><strong>Groundedness Validator</strong> - splits the answer into sentences and checks each one's embedding similarity against the retrieved context, optionally blended with an LLM judgment.</li>
+          <li><strong>Consensus Validator</strong> - pairwise cosine similarity between the Knowledge Graph, BM25, and Vector answers; low agreement flags a possible outlier.</li>
+          <li>These combine into a weighted final score that picks the <code>/compare</code> winner.</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>

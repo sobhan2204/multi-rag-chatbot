@@ -1,0 +1,38 @@
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+*.log
+
+# Don't bake the corpus/data into the image (mounted at runtime instead)
+data/
+
+# Don't bake local dev artifacts
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+
+# Editor/OS junk
+.vscode/
+.idea/
+.DS_Store
+
+# Not imported by main.py or core/ (see README "Not wired into the main pipeline") -
+# kept in the repo for reference but not needed in the runtime image
+dynamic_kg/
+validators/
+query_final_KG.py
+utils/query_intelligence.py
+enhanced_kg_graph.pkl
+uv.lock
+test.py
+README.md
+.claude/
